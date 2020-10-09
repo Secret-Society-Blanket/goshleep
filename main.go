@@ -1,11 +1,13 @@
 package main
-
-import (
-  "flag"
+import ( "flag"
   "fmt"
+  "os"
+  "os/signal"
+  "syscall"
+  "log"
 
   "github.com/bwmarrin/discordgo"
-  "github.com/goccy/go-yaml"
+  // "github.com/goccy/go-yaml"
 )
 
 // Variables used for command line parameters
@@ -61,41 +63,43 @@ func main() {
   }
 
   // Wait here until CTRL-C or other term signal is received.
-  fmt.Println("Bot is now running.  Press CTRL-C to exit.")
-  // sc := make(chan os.Signal, 1)
-  // signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
+  log.Println("Bot is now running.  Press CTRL-C to exit.")
+  sc := make(chan os.Signal, 1)
+  signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
   g := &Gif{
     URL:  "https://skyenet.online",
     Tags: []string{"test", "t"}}
-    g2 := &Gif{
-      URL:  "https://uberi.fi",
-      Tags: []string{"test", "a"}}
-      collection := gifs{g, g2}
-      fmt.Println(g.URL)
-      bytes, _ := yaml.Marshal(collection)
-      fmt.Println(string(bytes)) // "a: 1\nb: hello\n"
-      // <-sc
+  g2 := &Gif{
+    URL:  "https://uberi.fi",
+    Tags: []string{"test", "a"}}
+  collection := gifs{g, g2}
+  pat := []Verb{{collection,"pat"}}
 
-      // Cleanly close down the Discord session.
-      dg.Close()
-    }
+  out := Store(pat)
+  log.Println(out)
 
-    // This function will be called (due to AddHandler above) every time a new
-    // message is created on any channel that the authenticated bot has access to.
-    func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
+  <-sc
 
-      // Ignore all messages created by the bot itself
-      // This isn't required in this specific example but it's a good practice.
-      if m.Author.ID == s.State.User.ID {
-        return
-      }
-      // If the message is "ping" reply with "Pong!"
-      if m.Content == "ping" {
-        s.ChannelMessageSend(m.ChannelID, "Pong!")
-      }
+  // Cleanly close down the Discord session.
+  dg.Close()
+}
 
-      // If the message is "pong" reply with "Ping!"
-      if m.Content == "pong" {
-        s.ChannelMessageSend(m.ChannelID, "Ping!")
-      }
-    }
+// This function will be called (due to AddHandler above) every time a new
+// message is created on any channel that the authenticated bot has access to.
+func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
+
+  // Ignore all messages created by the bot itself
+  // This isn't required in this specific example but it's a good practice.
+  if m.Author.ID == s.State.User.ID {
+    return
+  }
+  // If the message is "ping" reply with "Pong!"
+  if m.Content == "ping" {
+    s.ChannelMessageSend(m.ChannelID, "Pong!")
+  }
+
+  // If the message is "pong" reply with "Ping!"
+  if m.Content == "pong" {
+    s.ChannelMessageSend(m.ChannelID, "Ping!")
+  }
+}
