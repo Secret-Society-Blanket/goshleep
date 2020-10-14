@@ -1,18 +1,20 @@
 package main
-import ( "flag"
-  "fmt"
-  "os"
-  "os/signal"
-  "syscall"
-  "log"
 
-  "github.com/bwmarrin/discordgo"
-  // "github.com/goccy/go-yaml"
+import (
+	"flag"
+	"fmt"
+	"log"
+	"os"
+	"os/signal"
+	"syscall"
+
+	"github.com/bwmarrin/discordgo"
+	// "github.com/goccy/go-yaml"
 )
 
 // Variables used for command line parameters
 var (
-  Token string
+	Token string
 )
 
 type strings []string
@@ -20,86 +22,86 @@ type gifs []*Gif
 
 // Verb is a collection of structs
 type Verb struct {
-  Images gifs
-  Name   string
+	Images gifs
+	Name   string
 }
 
 // Gif is a struct containing a url and tags
 type Gif struct {
-  URL  string
-  Tags []string
+	URL  string
+	Tags []string
 }
 
 func init() {
 
-  flag.StringVar(&Token, "t", "", "Bot Token")
-  flag.Parse()
+	flag.StringVar(&Token, "t", "", "Bot Token")
+	flag.Parse()
 }
 
 func verbCommand(message []string) []string {
-  return message
+	return message
 }
 
 func main() {
 
-  // Create a new Discord session using the provided bot token.
-  dg, err := discordgo.New("Bot " + Token)
-  if err != nil {
-    fmt.Println("error creating Discord session,", err)
-    return
-  }
+	// Create a new Discord session using the provided bot token.
+	dg, err := discordgo.New("Bot " + "token")
+	if err != nil {
+		fmt.Println("error creating Discord session,", err)
+		return
+	}
 
-  // Register the messageCreate func as a callback for MessageCreate events.
-  dg.AddHandler(messageCreate)
+	// Register the messageCreate func as a callback for MessageCreate events.
+	dg.AddHandler(messageCreate)
 
-  // In this example, we only care about receiving message events.
-  dg.Identify.Intents = discordgo.MakeIntent(discordgo.IntentsGuildMessages)
+	// In this example, we only care about receiving message events.
+	dg.Identify.Intents = discordgo.MakeIntent(discordgo.IntentsGuildMessages)
 
-  // Open a websocket connection to Discord and begin listening.
-  err = dg.Open()
-  if err != nil {
-    fmt.Println("error opening connection,", err)
-    return
-  }
+	// Open a websocket connection to Discord and begin listening.
+	err = dg.Open()
+	if err != nil {
+		fmt.Println("error opening connection,", err)
+		return
+	}
 
-  // Wait here until CTRL-C or other term signal is received.
-  log.Println("Bot is now running.  Press CTRL-C to exit.")
-  sc := make(chan os.Signal, 1)
-  signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
-  g := &Gif{
-    URL:  "https://skyenet.online",
-    Tags: []string{"test", "t"}}
-  g2 := &Gif{
-    URL:  "https://uberi.fi",
-    Tags: []string{"test", "a"}}
-  collection := gifs{g, g2}
-  pat := []Verb{{collection,"pat"}}
+	// Wait here until CTRL-C or other term signal is received.
+	log.Println("Bot is now running.  Press CTRL-C to exit.")
+	sc := make(chan os.Signal, 1)
+	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
+	g := &Gif{
+		URL:  "https://skyenet.online",
+		Tags: []string{"test", "t"}}
+	g2 := &Gif{
+		URL:  "https://uberi.fi",
+		Tags: []string{"test", "a"}}
+	collection := gifs{g, g2}
+	pat := []Verb{{collection, "pat"}}
 
-  out := Store(pat)
-  log.Println(out)
+	out := Store(pat)
+	log.Println(out)
 
-  <-sc
+	<-sc
 
-  // Cleanly close down the Discord session.
-  dg.Close()
+	// Cleanly close down the Discord session.
+	dg.Close()
 }
 
 // This function will be called (due to AddHandler above) every time a new
 // message is created on any channel that the authenticated bot has access to.
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
-  // Ignore all messages created by the bot itself
-  // This isn't required in this specific example but it's a good practice.
-  if m.Author.ID == s.State.User.ID {
-    return
-  }
-  // If the message is "ping" reply with "Pong!"
-  if m.Content == "ping" {
-    s.ChannelMessageSend(m.ChannelID, "Pong!")
-  }
+	// Ignore all messages created by the bot itself
+	// This isn't required in this specific example but it's a good practice.
+	if m.Author.ID == s.State.User.ID {
+		return
+	}
+	// If the message is "ping" reply with "Pong!"
+	if m.Content == "ping" {
+		s.ChannelMessageSend(m.ChannelID, "Pong!")
+	}
 
-  // If the message is "pong" reply with "Ping!"
-  if m.Content == "pong" {
-    s.ChannelMessageSend(m.ChannelID, "Ping!")
-  }
+	// If the message is "pong" reply with "Ping!"
+	if m.Content == "pong" {
+		s.ChannelMessageSend(m.ChannelID, "Ping!")
+	}
 }
