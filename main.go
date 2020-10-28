@@ -19,8 +19,9 @@ var (
 
 type strings []string
 type gifs []*Gif
+type verbs []Verb
 
-// Verb is a collection of structs
+// Verb is a collection of gifs
 type Verb struct {
 	Images gifs
 	Name   string
@@ -45,7 +46,7 @@ func verbCommand(message []string) []string {
 func main() {
 
 	// Create a new Discord session using the provided bot token.
-	dg, err := discordgo.New("Bot " + "token")
+	dg, err := discordgo.New("Bot " + Token)
 	if err != nil {
 		fmt.Println("error creating Discord session,", err)
 		return
@@ -68,18 +69,18 @@ func main() {
 	log.Println("Bot is now running.  Press CTRL-C to exit.")
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
-	g := &Gif{
-		URL:  "https://skyenet.online",
-		Tags: []string{"test", "t"}}
-	g2 := &Gif{
-		URL:  "https://uberi.fi",
-		Tags: []string{"test", "a"}}
-	collection := gifs{g, g2}
-	pat := []Verb{{collection, "pat"}}
+	// g := &Gif{
+	// 	URL:  "https://skyenet.online",
+	// 	Tags: []string{"test", "t"}}
+	// g2 := &Gif{
+	// 	URL:  "https://uberi.fi",
+	// 	Tags: []string{"test", "a"}}
+	// collection := gifs{g, g2}
+	// pat := []Verb{{collection, "pat"}}
+	v := &[]Verb{}
 
-	out := Store(pat)
-	log.Println(out)
-
+	Load(v)
+	fmt.Println(*v)
 	<-sc
 
 	// Cleanly close down the Discord session.

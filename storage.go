@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"os"
 	"time"
@@ -23,6 +25,7 @@ func Store(toStore []Verb) string {
 	t := time.Now()
 	prefix := t.Format("15:04-2-1-06|")
 	fi := writeToFile(prefix+suffix, string(bytes))
+	writeToFile("stored.yaml", string(bytes))
 	log.Println(fi)
 	log.Println(string(bytes))
 
@@ -30,8 +33,11 @@ func Store(toStore []Verb) string {
 
 }
 
-func Load(toLoad string) []Verb {
-
+func Load(out *[]Verb) {
+	txt := loadFromFile("stored.yaml")
+	if err := yaml.Unmarshal(txt, out); err != nil {
+		fmt.Println(err)
+	}
 }
 
 func writeToFile(filename string, data string) error {
@@ -47,4 +53,13 @@ func writeToFile(filename string, data string) error {
 	}
 
 	return file.Sync()
+}
+
+func loadFromFile(filename string) []byte {
+	txt, err := ioutil.ReadFile(filename)
+	if err != nil {
+		fmt.Println(err)
+	}
+	return txt
+
 }
