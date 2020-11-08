@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 
 	"github.com/bwmarrin/discordgo"
@@ -14,10 +15,12 @@ import (
 
 // Variables used for command line parameters
 var (
-	Token string
+	Token    string
+	allVerbs []Verb
+	Prefix   string
 )
 
-type strings []string
+// type strings []string
 type gifs []*Gif
 type verbs []Verb
 
@@ -36,11 +39,8 @@ type Gif struct {
 func init() {
 
 	flag.StringVar(&Token, "t", "", "Bot Token")
+	flag.StringVar(&Prefix, "p", "+", "Prefix")
 	flag.Parse()
-}
-
-func verbCommand(message []string) []string {
-	return message
 }
 
 func main() {
@@ -69,19 +69,25 @@ func main() {
 	log.Println("Bot is now running.  Press CTRL-C to exit.")
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
-	// g := &Gif{
-	// 	URL:  "https://skyenet.online",
-	// 	Tags: []string{"test", "t"}}
-	// g2 := &Gif{
-	// 	URL:  "https://uberi.fi",
-	// 	Tags: []string{"test", "a"}}
-	// collection := gifs{g, g2}
-	// pat := []Verb{{collection, "pat"}}
-	v := &[]Verb{}
 
-	Load(v)
-	fmt.Println(*v)
+	// g := &Gif{
+	// 	URL:  "skyenet.online",
+	// 	Tags: []string{"test", "t"},
+	// }
+	// // g2 := &Gif{
+	// // 	URL:  "https://uberi.fi",
+	// // 	Tags: []string{"test", "a"}}
+
+	// collection := gifs{g}
+	// allVerbs = []Verb{{collection, "pat"}}
+
+	// v := []Verb{}
+
+	// Load(&v)
+	// fmt.Println(v)
 	<-sc
+
+	log.Println("Closing Bot.")
 
 	// Cleanly close down the Discord session.
 	dg.Close()
@@ -91,10 +97,18 @@ func main() {
 // message is created on any channel that the authenticated bot has access to.
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
+	log.Println("Inside message")
+	var out discordgo.MessageSend
+
 	// Ignore all messages created by the bot itself
 	// This isn't required in this specific example but it's a good practice.
 	if m.Author.ID == s.State.User.ID {
 		return
+	}
+	splitm := strings.Split(m.Content, " ")
+
+	if strings.HasPrefix(splitm[0], Prefix) {
+		out = VerbCommand(splitm, &allVerbs)
 	}
 	// If the message is "ping" reply with "Pong!"
 	if m.Content == "ping" {
@@ -103,6 +117,6 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	// If the message is "pong" reply with "Ping!"
 	if m.Content == "pong" {
-		s.ChannelMessageSend(m.ChannelID, "Ping!")
+		s.ChannelMessageSendComplex(m.ChannelID, &out)
 	}
 }
