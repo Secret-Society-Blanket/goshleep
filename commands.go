@@ -2,7 +2,9 @@ package main
 
 import (
 	"github.com/bwmarrin/discordgo"
+	"github.com/lithammer/fuzzysearch/fuzzy"
 	"log"
+	"sort"
 	"strings"
 )
 
@@ -18,4 +20,20 @@ func VerbCommand(cmd []string, allVerbs *[]Verb) discordgo.MessageSend {
 	log.Println("Found Verb: " + v)
 
 	return m
+}
+
+func getVerb(toFind string, allVerbs *[]Verb) (*Verb, bool) {
+	var out *Verb
+	fuzz := false
+	for _, v := range *allVerbs {
+		if fuzzy.MatchFold(toFind, v.Name) {
+			if toFind != v.Name {
+				fuzz = true
+			}
+			out = &v
+		}
+	}
+
+	return out, fuzz
+
 }
