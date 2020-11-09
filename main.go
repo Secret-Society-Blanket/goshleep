@@ -70,16 +70,16 @@ func main() {
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
 
-	// g := &Gif{
-	// 	URL:  "skyenet.online",
-	// 	Tags: []string{"test", "t"},
-	// }
-	// // g2 := &Gif{
-	// // 	URL:  "https://uberi.fi",
-	// // 	Tags: []string{"test", "a"}}
+	g := &Gif{
+		URL:  "skyenet.online",
+		Tags: []string{"test", "t"},
+	}
+	// g2 := &Gif{
+	// 	URL:  "https://uberi.fi",
+	// 	Tags: []string{"test", "a"}}
 
-	// collection := gifs{g}
-	// allVerbs = []Verb{{collection, "pat"}}
+	collection := gifs{g}
+	allVerbs = []Verb{{collection, "pat"}}
 
 	// v := []Verb{}
 
@@ -108,15 +108,16 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	splitm := strings.Split(m.Content, " ")
 
 	if strings.HasPrefix(splitm[0], Prefix) {
-		out = VerbCommand(splitm, &allVerbs)
+		out = VerbCommand(m, &allVerbs)
 	}
 	// If the message is "ping" reply with "Pong!"
 	if m.Content == "ping" {
-		s.ChannelMessageSend(m.ChannelID, "Pong!")
+		out = ListVerbs(&allVerbs)
 	}
 
 	// If the message is "pong" reply with "Ping!"
 	if m.Content == "pong" {
 		s.ChannelMessageSendComplex(m.ChannelID, &out)
 	}
+	s.ChannelMessageSendComplex(m.ChannelID, &out)
 }
