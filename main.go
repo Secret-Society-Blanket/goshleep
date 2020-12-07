@@ -71,7 +71,7 @@ func main() {
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
 
 	g := &Gif{
-		URL:  "skyenet.online",
+		URL:  "https://media1.tenor.com/images/4d89d7f963b41a416ec8a55230dab31b/tenor.gif?itemid=5166500",
 		Tags: []string{"test", "t"},
 	}
 	// g2 := &Gif{
@@ -95,7 +95,8 @@ func main() {
 
 // This function will be called (due to AddHandler above) every time a new
 // message is created on any channel that the authenticated bot has access to.
-func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
+func messageCreate(s *discordgo.Session, mCreate *discordgo.MessageCreate) {
+	m := mCreate.Message
 
 	log.Println("Inside message")
 	var out discordgo.MessageSend
@@ -108,7 +109,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	splitm := strings.Split(m.Content, " ")
 
 	if strings.HasPrefix(splitm[0], Prefix) {
-		out = VerbCommand(m, &allVerbs)
+		out = VerbCommand(m, s, &allVerbs)
 	}
 	// If the message is "ping" reply with "Pong!"
 	if m.Content == "ping" {
