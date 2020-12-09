@@ -45,7 +45,11 @@ func VerbCommand(ogMessage *discordgo.Message, s *discordgo.Session, allVerbs *[
 			recipientArray := cmd[1 : i+1]
 			log.Println("Found names", recipientArray)
 			recipient := strings.Join(recipientArray, " ")
+
+			// This is the format of the message
 			title := "**RECIPIENT**, you got a **VERB** from **SENDER**"
+
+			// If there are mentions, use them as the recipients
 			if len(ogMessage.Mentions) > 0 {
 				recipient = getMentionNames(ogMessage, s)
 				log.Println(recipient)
@@ -101,19 +105,28 @@ func ListVerbs(allVerbs *[]Verb) discordgo.MessageSend {
 }
 
 func getVerb(toFind string, allVerbs *[]Verb) (*Verb, bool) {
-	var out *Verb
-	out = nil
+	var out Verb
+	out = Verb{
+		Images: gifs{
+			&Gif{
+				URL:  "https://animemotivation.com/wp-content/uploads/2020/06/cute-anime-cat-girl-confused-e1592069452432.jpg",
+				Tags: []string{},
+			},
+		},
+		Name: "unknown",
+	}
 	fuzz := false
 	for _, v := range *allVerbs {
 		if fuzzy.MatchFold(toFind, v.Name) {
+			log.Println(v.Name, "matches", toFind)
 			if toFind != v.Name {
 				fuzz = true
 			}
-			out = &v
+			out = v
 		}
 	}
 
-	return out, fuzz
+	return &out, fuzz
 }
 
 func getName(u *discordgo.Member) string {

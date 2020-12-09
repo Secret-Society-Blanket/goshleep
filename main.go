@@ -81,10 +81,13 @@ func main() {
 	collection := gifs{g}
 	allVerbs = []Verb{{collection, "pat"}}
 
-	// v := []Verb{}
+	// Store(allVerbs)
 
-	// Load(&v)
-	// fmt.Println(v)
+	v := []Verb{}
+
+	Load(&v)
+	allVerbs = v
+	fmt.Println(v)
 	<-sc
 
 	log.Println("Closing Bot.")
