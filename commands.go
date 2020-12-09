@@ -116,13 +116,21 @@ func getVerb(toFind string, allVerbs *[]Verb) (*Verb, bool) {
 		Name: "unknown",
 	}
 	fuzz := false
+	last := 10
 	for _, v := range *allVerbs {
-		if fuzzy.MatchFold(toFind, v.Name) {
+		// Get the levensthien distance if it matches, otherwise return -1
+		i := fuzzy.RankMatchFold(toFind, v.Name)
+		// If it matches, and the distance is less than 4
+		if i != -1 && i < 4 {
 			log.Println(v.Name, "matches", toFind)
-			if toFind != v.Name {
-				fuzz = true
+
+			// Is the distance less than the last?
+			// If not, ignore the result
+			if i < last {
+				out = v
+				last = i
 			}
-			out = v
+
 		}
 	}
 
