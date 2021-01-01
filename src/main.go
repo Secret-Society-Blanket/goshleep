@@ -10,6 +10,7 @@ import (
 	"syscall"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/spf13/viper"
 	// "github.com/goccy/go-yaml"
 )
 
@@ -44,6 +45,11 @@ func init() {
 }
 
 func main() {
+	AutoConfig()
+
+	if Prefix == "+" {
+		Prefix = viper.GetString("prefix")
+	}
 
 	// Create a new Discord session using the provided bot token.
 	dg, err := discordgo.New("Bot " + Token)
@@ -79,15 +85,13 @@ func main() {
 	// 	Tags: []string{"test", "a"}}
 
 	collection := gifs{g}
-	allVerbs = []Verb{{collection, "pat"}}
-
-	// Store(allVerbs)
-
+	allVerbs = []Verb{{collection, "pat"}} // Store(allVerbs)
 	v := []Verb{}
 
 	Load(&v)
 	allVerbs = v
-	fmt.Println(v)
+	Store(v)
+	//fmt.Println(v)
 	<-sc
 
 	log.Println("Closing Bot.")
@@ -102,7 +106,7 @@ func messageCreate(s *discordgo.Session, mCreate *discordgo.MessageCreate) {
 	m := mCreate.Message
 
 	log.Println("Inside message")
-	var out discordgo.MessageSend
+	out := discordgo.MessageSend{}
 
 	// Ignore all messages created by the bot itself
 	// This isn't required in this specific example but it's a good practice.
@@ -111,11 +115,7 @@ func messageCreate(s *discordgo.Session, mCreate *discordgo.MessageCreate) {
 	}
 	splitm := strings.Split(m.Content, " ")
 
-	if strings.HasPrefix(splitm[0], Prefix) {
-		out = VerbCommand(m, s, &allVerbs)
-	}
-	// If the message is "ping" reply with "Pong!"
-	if m.Content == "ping" {
+	if m.Content == viper.GetString("cmdprefix")+"verbs" {
 		out = ListVerbs(&allVerbs)
 	}
 
@@ -123,5 +123,10 @@ func messageCreate(s *discordgo.Session, mCreate *discordgo.MessageCreate) {
 	if m.Content == "pong" {
 		s.ChannelMessageSendComplex(m.ChannelID, &out)
 	}
+	if (strings.HasPrefix(splitm[0], Prefix) && out.Content == discordgo.MessageSend{}.Content) {
+		out = VerbCommand(m, s, &allVerbs)
+	}
+
 	s.ChannelMessageSendComplex(m.ChannelID, &out)
+
 }

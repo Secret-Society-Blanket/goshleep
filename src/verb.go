@@ -51,12 +51,12 @@ func VerbCommand(ogMessage *discordgo.Message, s *discordgo.Session, allVerbs *[
 
 			// If there are mentions, use them as the recipients
 			if len(ogMessage.Mentions) > 0 {
-				recipient = getMentionNames(ogMessage, s)
+				recipient = GetMentionNames(ogMessage, s)
 				log.Println(recipient)
 			}
 			title = strings.ReplaceAll(title, "RECIPIENT", recipient)
 			title = strings.ReplaceAll(title, "VERB", v.Name)
-			title = strings.ReplaceAll(title, "SENDER", getName(ogMessage.Member))
+			title = strings.ReplaceAll(title, "SENDER", GetName(ogMessage.Member))
 			m.Embed = &discordgo.MessageEmbed{
 				Title: title,
 			}
@@ -64,7 +64,7 @@ func VerbCommand(ogMessage *discordgo.Message, s *discordgo.Session, allVerbs *[
 		} else {
 			title := "**SENDER sent a VERB**"
 			title = strings.ReplaceAll(title, "VERB", v.Name)
-			title = strings.ReplaceAll(title, "SENDER", getName(ogMessage.Member))
+			title = strings.ReplaceAll(title, "SENDER", GetName(ogMessage.Member))
 			m.Embed = &discordgo.MessageEmbed{
 				Title: title,
 			}
@@ -119,7 +119,9 @@ func getVerb(toFind string, allVerbs *[]Verb) (*Verb, bool) {
 	last := 10
 	for _, v := range *allVerbs {
 		// Get the levensthien distance if it matches, otherwise return -1
-		i := fuzzy.RankMatchFold(toFind, v.Name)
+		i := fuzzy.LevenshteinDistance(strings.ToLower(toFind),
+			strings.ToLower(v.Name))
+
 		// If it matches, and the distance is less than 4
 		if i != -1 && i < 4 {
 			log.Println(v.Name, "matches", toFind)
@@ -127,6 +129,11 @@ func getVerb(toFind string, allVerbs *[]Verb) (*Verb, bool) {
 			// Is the distance less than the last?
 			// If not, ignore the result
 			if i < last {
+				if i != 0 {
+					fuzz = true
+				} else {
+					fuzz = false
+				}
 				out = v
 				last = i
 			}
@@ -135,22 +142,4 @@ func getVerb(toFind string, allVerbs *[]Verb) (*Verb, bool) {
 	}
 
 	return &out, fuzz
-}
-
-func getName(u *discordgo.Member) string {
-	if u.Nick != "" {
-		return u.Nick
-	}
-	return u.User.Username
-}
-
-func getMentionNames(m *discordgo.Message, s *discordgo.Session) string {
-
-	var names []string
-	for _, user := range m.Mentions {
-		member, _ := s.GuildMember(m.GuildID, user.ID)
-		names = append(names, getName(member))
-	}
-	return strings.Join(names, " and ")
-
 }
