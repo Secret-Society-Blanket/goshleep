@@ -31,8 +31,7 @@ type Verb struct {
 	Name   string
 }
 
-// Gif is a struct containing a url and tags
-type Gif struct {
+// Gif is a struct containing a url and tags type Gif struct {
 	URL  string
 	Tags []string
 }
