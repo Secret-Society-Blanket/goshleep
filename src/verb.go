@@ -9,15 +9,27 @@ import (
 	"github.com/lithammer/fuzzysearch/fuzzy"
 )
 
+// Verb is a collection of gifs
+type Verb struct {
+	Images []*Gif
+	Name   string
+}
+
+// Gif is a struct containing a url and tags
+type Gif struct {
+	URL  string
+	Tags []string
+}
+
 // VerbCommand takes in the follow expected string template:
 // +<verb> [recipient] [-t tags]
 // and returns a discord message, including a gif reaction
 // of the inputted verb, assuming one exists.
-func VerbCommand(ogMessage *discordgo.Message, s *discordgo.Session, allVerbs *[]Verb) discordgo.MessageSend {
+func VerbCommand(myRequest Request, s *discordgo.Session, allVerbs *[]Verb) discordgo.MessageSend {
 	// Create the message to send out
 	m := discordgo.MessageSend{}
 
-	cmd := strings.Split(ogMessage.Content, " ")
+	cmd := myRequest.SplitContent
 
 	// This is finding the "verb" command
 	v, _ := getVerb(cmd[0][len(Prefix):], allVerbs)
@@ -50,13 +62,13 @@ func VerbCommand(ogMessage *discordgo.Message, s *discordgo.Session, allVerbs *[
 			title := "**RECIPIENT**, you got a **VERB** from **SENDER**"
 
 			// If there are mentions, use them as the recipients
-			if len(ogMessage.Mentions) > 0 {
-				recipient = GetMentionNames(ogMessage, s)
+			if len(myRequest.dMessage.Content) > 0 {
+				recipient = GetMentionNames(&myRequest.dMessage, s)
 				log.Println(recipient)
 			}
 			title = strings.ReplaceAll(title, "RECIPIENT", recipient)
 			title = strings.ReplaceAll(title, "VERB", v.Name)
-			title = strings.ReplaceAll(title, "SENDER", GetName(ogMessage.Member))
+			title = strings.ReplaceAll(title, "SENDER", GetName(myRequest.dMessage.Member))
 			m.Embed = &discordgo.MessageEmbed{
 				Title: title,
 			}
@@ -64,7 +76,7 @@ func VerbCommand(ogMessage *discordgo.Message, s *discordgo.Session, allVerbs *[
 		} else {
 			title := "**SENDER sent a VERB**"
 			title = strings.ReplaceAll(title, "VERB", v.Name)
-			title = strings.ReplaceAll(title, "SENDER", GetName(ogMessage.Member))
+			title = strings.ReplaceAll(title, "SENDER", GetName(myRequest.dMessage.Member))
 			m.Embed = &discordgo.MessageEmbed{
 				Title: title,
 			}
@@ -107,7 +119,7 @@ func ListVerbs(allVerbs *[]Verb) discordgo.MessageSend {
 func getVerb(toFind string, allVerbs *[]Verb) (*Verb, bool) {
 	var out Verb
 	out = Verb{
-		Images: gifs{
+		Images: []*Gif{
 			&Gif{
 				URL:  "https://animemotivation.com/wp-content/uploads/2020/06/cute-anime-cat-girl-confused-e1592069452432.jpg",
 				Tags: []string{},

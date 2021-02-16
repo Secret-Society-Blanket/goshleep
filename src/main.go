@@ -22,19 +22,9 @@ var (
 )
 
 // type strings []string
+
 type gifs []*Gif
 type verbs []Verb
-
-// Verb is a collection of gifs
-type Verb struct {
-	Images gifs
-	Name   string
-}
-
-// Gif is a struct containing a url and tags type Gif struct {
-	URL  string
-	Tags []string
-}
 
 func init() {
 
@@ -102,14 +92,16 @@ func main() {
 // This function will be called (due to AddHandler above) every time a new
 // message is created on any channel that the authenticated bot has access to.
 func messageCreate(s *discordgo.Session, mCreate *discordgo.MessageCreate) {
-	m := mCreate.Message
+	m := ConstructRequest(*mCreate.Message)
+
+
 
 	log.Println("Inside message")
 	out := discordgo.MessageSend{}
 
 	// Ignore all messages created by the bot itself
 	// This isn't required in this specific example but it's a good practice.
-	if m.Author.ID == s.State.User.ID {
+	if m.dMessage.Author.ID == s.State.User.ID {
 		return
 	}
 	splitm := strings.Split(m.Content, " ")
@@ -120,12 +112,12 @@ func messageCreate(s *discordgo.Session, mCreate *discordgo.MessageCreate) {
 
 	// If the message is "pong" reply with "Ping!"
 	if m.Content == "pong" {
-		s.ChannelMessageSendComplex(m.ChannelID, &out)
+		s.ChannelMessageSendComplex(m.dMessage.ChannelID, &out)
 	}
 	if (strings.HasPrefix(splitm[0], Prefix) && out.Content == discordgo.MessageSend{}.Content) {
 		out = VerbCommand(m, s, &allVerbs)
 	}
 
-	s.ChannelMessageSendComplex(m.ChannelID, &out)
+	s.ChannelMessageSendComplex(m.dMessage.ChannelID, &out)
 
 }

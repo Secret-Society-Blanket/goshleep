@@ -26,3 +26,17 @@ func GetMentionNames(m *discordgo.Message, s *discordgo.Session) string {
 	return strings.Join(names, " and ")
 
 }
+
+func IfInString (arr []string, check string) bool{
+
+	out := false
+
+	for i := 0; i < len(arr); i++ {
+
+		if (arr[i] == check) {
+			out = true
+		}
+	}
+
+	return out
+}
