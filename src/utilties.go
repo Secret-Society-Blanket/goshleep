@@ -3,6 +3,8 @@ package main
 import (
 	"strings"
 
+	"log"
+	"github.com/spf13/viper"
 	"github.com/bwmarrin/discordgo"
 )
 
@@ -27,13 +29,15 @@ func GetMentionNames(m *discordgo.Message, s *discordgo.Session) string {
 
 }
 
-func IfInString (arr []string, check string) bool{
+// Checks
+func IfMatchHotStrings (arr []string, check string) bool{
 
 	out := false
 
 	for i := 0; i < len(arr); i++ {
 
-		if (arr[i] == check) {
+		log.Println(arr[i])
+		if (strings.HasPrefix(check, viper.GetString("prefix") + arr[i])) {
 			out = true
 		}
 	}

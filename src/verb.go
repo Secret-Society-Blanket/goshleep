@@ -101,18 +101,17 @@ func VerbCommand(myRequest Request, s *discordgo.Session, allVerbs *[]Verb) disc
 }
 
 // ListVerbs lists all verbs in allVerbs
-func ListVerbs(allVerbs *[]Verb) discordgo.MessageSend {
+func ListVerbs(_ Request, _ *discordgo.Session, allVerbs *[]Verb) discordgo.MessageSend {
 	m := discordgo.MessageSend{}
 
+	m.Content = "```"
 	var verbNames []string
-	log.Println(*allVerbs)
 	for _, v := range *allVerbs {
 		verbNames = append(verbNames, v.Name)
 		// Temporary, change this later!
 		m.Content = m.Content + v.Name + "\n"
-		log.Println(v.Name)
 	}
-
+	m.Content = m.Content + "\n```"
 	return m
 }
 

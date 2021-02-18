@@ -1,8 +1,10 @@
 package main
 
 import (
-	"github.com/bwmarrin/discordgo"
 	"strings"
+
+	"github.com/bwmarrin/discordgo"
+	"log"
 )
 
 
@@ -39,29 +41,43 @@ var (
 	AllCommands []Command = []Command{
 
 
-
-		// This should always be last, since it uses + as it's only prefix
+		// This should always be first, since it uses + as it's only prefix
 		Command {
 			Name: "Verb",
 			Description: "Posts a gif based on the arguments the user gives",
-			HotStrings: []string{"+"},
+			HotStrings: []string{""},
 			Function: VerbCommand,
 			Admin: false,
 			Priority: 0,
-		} }
+		},
+		Command {
+			Name: "List Verbs",
+			Description: "Lists all verbs",
+			HotStrings: []string{"verbs"},
+			Function: ListVerbs,
+			Admin: false,
+			Priority: 0,
+		},
+
+	}
 )
 
 func ConstructRequest (m discordgo.Message) Request {
 
 	split := strings.Split(m.Content, " ")
 
-	var cmd Command
+	var cmd *Command
 
 	for i:= 0; i < len(AllCommands); i++ {
-		if (IfInString(AllCommands[i].HotStrings, split[0])) {
-			cmd = AllCommands[i]
+		if (IfMatchHotStrings(AllCommands[i].HotStrings, split[0])) {
+			cmd = &AllCommands[i]
 		}
 	}
+
+	if (cmd == nil) {
+		log.Println("Found no command")
+	}
+
 
 
 	out := Request{
@@ -69,7 +85,7 @@ func ConstructRequest (m discordgo.Message) Request {
 		Content: m.Content,
 		SplitContent: split,
 		dMessage: m,
-		Type: cmd,
+		Type: *cmd,
 
 	}
 
@@ -79,5 +95,8 @@ func ConstructRequest (m discordgo.Message) Request {
 }
 
 func ParseRequest (r Request, s *discordgo.Session, allVerbs *[]Verb) discordgo.MessageSend  {
+
+	log.Println(r.Type.Name)
+	log.Println(r.Type.HotStrings)
 	return r.Type.Function(r, s, allVerbs)
 }

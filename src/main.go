@@ -6,8 +6,8 @@ import (
 	"log"
 	"os"
 	"os/signal"
-	"strings"
 	"syscall"
+	"strings"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/spf13/viper"
@@ -92,32 +92,35 @@ func main() {
 // This function will be called (due to AddHandler above) every time a new
 // message is created on any channel that the authenticated bot has access to.
 func messageCreate(s *discordgo.Session, mCreate *discordgo.MessageCreate) {
-	m := ConstructRequest(*mCreate.Message)
+	if (strings.HasPrefix(mCreate.Message.Content, "+")) {
+		m := ConstructRequest(*mCreate.Message)
 
 
 
-	log.Println("Inside message")
-	out := discordgo.MessageSend{}
+		log.Println("Inside message")
+		out := discordgo.MessageSend{}
 
-	// Ignore all messages created by the bot itself
-	// This isn't required in this specific example but it's a good practice.
-	if m.dMessage.Author.ID == s.State.User.ID {
-		return
-	}
-	splitm := strings.Split(m.Content, " ")
+		// Ignore all messages created by the bot itself
+		// This isn't required in this specific example but it's a good practice.
+		if m.dMessage.Author.ID == s.State.User.ID {
+			return
+		}
+		out = ParseRequest(m, s, &allVerbs);
+		// splitm := strings.Split(m.Content, " ")
 
-	if m.Content == viper.GetString("cmdprefix")+"verbs" {
-		out = ListVerbs(&allVerbs)
-	}
+		// if m.Content == viper.GetString("cmdprefix")+"verbs" {
+		// 	out = ListVerbs(&allVerbs)
+		// }
 
-	// If the message is "pong" reply with "Ping!"
-	if m.Content == "pong" {
+		// // If the message is "pong" reply with "Ping!"
+		// if m.Content == "pong" {
+		// 	s.ChannelMessageSendComplex(m.dMessage.ChannelID, &out)
+		// }
+		// if (strings.HasPrefix(splitm[0], Prefix) && out.Content == discordgo.MessageSend{}.Content) {
+		// 	out = VerbCommand(m, s, &allVerbs)
+		// }
+
 		s.ChannelMessageSendComplex(m.dMessage.ChannelID, &out)
 	}
-	if (strings.HasPrefix(splitm[0], Prefix) && out.Content == discordgo.MessageSend{}.Content) {
-		out = VerbCommand(m, s, &allVerbs)
-	}
-
-	s.ChannelMessageSendComplex(m.dMessage.ChannelID, &out)
 
 }
