@@ -42,7 +42,7 @@ var (
 
 
 		// This should always be first, since it uses + as it's only prefix
-		Command {
+		{
 			Name: "Verb",
 			Description: "Posts a gif based on the arguments the user gives",
 			HotStrings: []string{""},
@@ -50,10 +50,18 @@ var (
 			Admin: false,
 			Priority: 0,
 		},
-		Command {
+		{
 			Name: "List Verbs",
 			Description: "Lists all verbs",
 			HotStrings: []string{"verbs"},
+			Function: ListVerbs,
+			Admin: false,
+			Priority: 0,
+		},
+		{
+			Name: "Eightball",
+			Description: "Ask Shleepbot your most pressing questions...",
+			HotStrings: []string{"eightball"},
 			Function: ListVerbs,
 			Admin: false,
 			Priority: 0,

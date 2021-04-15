@@ -64,7 +64,6 @@ func VerbCommand(myRequest Request, s *discordgo.Session, allVerbs *[]Verb) disc
 			// If there are mentions, use them as the recipients
 			if len(myRequest.dMessage.Content) > 0 {
 				recipient = GetMentionNames(&myRequest.dMessage, s)
-				log.Println(recipient)
 			}
 			title = strings.ReplaceAll(title, "RECIPIENT", recipient)
 			title = strings.ReplaceAll(title, "VERB", v.Name)
@@ -82,7 +81,6 @@ func VerbCommand(myRequest Request, s *discordgo.Session, allVerbs *[]Verb) disc
 			}
 		}
 		// Get the actual image
-		log.Println("Images", len(v.Images))
 		var num int
 		if len(v.Images) > 1 {
 			log.Println("I found a number of images")

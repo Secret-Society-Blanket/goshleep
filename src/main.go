@@ -6,8 +6,8 @@ import (
 	"log"
 	"os"
 	"os/signal"
-	"syscall"
 	"strings"
+	"syscall"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/spf13/viper"
