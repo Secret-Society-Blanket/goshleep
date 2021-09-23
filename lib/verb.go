@@ -1,4 +1,4 @@
-package main
+package goshleep
 
 import (
 	"log"
@@ -7,6 +7,7 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/lithammer/fuzzysearch/fuzzy"
+	"github.com/spf13/viper"
 )
 
 // Verb is a collection of gifs
@@ -32,7 +33,7 @@ func VerbCommand(myRequest Request, s *discordgo.Session, allVerbs *[]Verb) disc
 	cmd := myRequest.SplitContent
 
 	// This is finding the "verb" command
-	v, _ := getVerb(cmd[0][len(Prefix):], allVerbs)
+	v, _ := getVerb(cmd[0][len(viper.GetString("prefix")):], allVerbs)
 
 	// If there is no verb
 	if v == nil {

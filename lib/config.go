@@ -1,4 +1,4 @@
-package main
+package goshleep
 
 import (
 	"log"
@@ -14,7 +14,8 @@ func AutoConfig() {
 	viper.SetDefault("storage", usr.HomeDir+"/.config/goshleep/")
 	viper.SetDefault("prefix", "+")
 	viper.SetDefault("cmdPrefix", "+")
-	viper.SetDefault("eightballMessages", []string{"Senpai, pls no ;-;", "Take a wild guess...",
+	viper.SetDefault("eightballMessages", []string{"Senpai, pls no ;-;",
+		"Take a wild guess...",
         "Without a doubt", "No", "Yes", "You'll be the judge", "Sure",
         "Of course", "No way", "No... (╯°□°）╯︵ ┻━┻", "Very doubtful",
         "Most likely", "Might be possible" })

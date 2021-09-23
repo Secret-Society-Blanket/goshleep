@@ -9,22 +9,21 @@ import (
 	"strings"
 	"syscall"
 
+	"github.com/Secret-Society-Blanket/goshleep/lib"
+
 	"github.com/bwmarrin/discordgo"
 	"github.com/spf13/viper"
-	// "github.com/goccy/go-yaml"
 )
 
 // Variables used for command line parameters
 var (
 	Token    string
-	allVerbs []Verb
+	allVerbs []goshleep.Verb
 	Prefix   string
 )
 
-// type strings []string
-
-type gifs []*Gif
-type verbs []Verb
+type gifs []*goshleep.Gif
+type verbs []goshleep.Verb
 
 func init() {
 
@@ -34,7 +33,7 @@ func init() {
 }
 
 func main() {
-	AutoConfig()
+	goshleep.AutoConfig()
 
 	if Prefix == "+" {
 		Prefix = viper.GetString("prefix")
@@ -65,25 +64,25 @@ func main() {
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
 
-	g := &Gif{
+	g := &goshleep.Gif{
 		URL:  "https://media1.tenor.com/images/4d89d7f963b41a416ec8a55230dab31b/tenor.gif?itemid=5166500",
 		Tags: []string{"test", "t"},
 	}
-	// g2 := &Gif{
+	// g2 := &goshleep.Gif{
 	// 	URL:  "https://uberi.fi",
 	// 	Tags: []string{"test", "a"}}
 
 	collection := gifs{g}
-	allVerbs = []Verb{{collection, "pat"}} // Store(allVerbs)
-	v := []Verb{}
+	allVerbs = []goshleep.Verb{{Images: collection, Name: "pat"}} // Store(allVerbs)
+	v := []goshleep.Verb{}
 
-	Load(&v)
+	goshleep.Load(&v)
 	allVerbs = v
-	Store(v)
+	goshleep.Store(v)
 	//fmt.Println(v)
 	<-sc
 
-	log.Println("Closing Bot.")
+	log.Println("Closing bot.")
 
 	// Cleanly close down the Discord session.
 	dg.Close()
@@ -92,20 +91,18 @@ func main() {
 // This function will be called (due to AddHandler above) every time a new
 // message is created on any channel that the authenticated bot has access to.
 func messageCreate(s *discordgo.Session, mCreate *discordgo.MessageCreate) {
-	if (strings.HasPrefix(mCreate.Message.Content, "+")) {
-		m := ConstructRequest(*mCreate.Message)
-
-
+	if strings.HasPrefix(mCreate.Message.Content, "+") {
+		m := goshleep.ConstructRequest(*mCreate.Message)
 
 		log.Println("Inside message")
 		out := discordgo.MessageSend{}
 
 		// Ignore all messages created by the bot itself
 		// This isn't required in this specific example but it's a good practice.
-		if m.dMessage.Author.ID == s.State.User.ID {
+		if mCreate.Author.ID == s.State.User.ID {
 			return
 		}
-		out = ParseRequest(m, s, &allVerbs);
+		out = goshleep.ParseRequest(m, s, &allVerbs)
 		// splitm := strings.Split(m.Content, " ")
 
 		// if m.Content == viper.GetString("cmdprefix")+"verbs" {
@@ -120,7 +117,7 @@ func messageCreate(s *discordgo.Session, mCreate *discordgo.MessageCreate) {
 		// 	out = VerbCommand(m, s, &allVerbs)
 		// }
 
-		s.ChannelMessageSendComplex(m.dMessage.ChannelID, &out)
+		s.ChannelMessageSendComplex(mCreate.ChannelID, &out)
 	}
 
 }
