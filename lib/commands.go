@@ -6,7 +6,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-type CommandFunction func(details Request, s *discordgo.Session, allVerbs *[]Verb) discordgo.MessageSend
+type CommandFunction func(details *Request, s *discordgo.Session, allVerbs *[]Verb) discordgo.MessageSend
 
 type Request struct {
 	dMessage discordgo.Message
@@ -16,6 +16,8 @@ type Request struct {
 	SplitContent []string
 
 	Type Command
+
+	Resp *Response `default: nil`
 }
 
 type Command struct {
@@ -85,13 +87,13 @@ func ConstructRequest(m discordgo.Message) Request {
 		SplitContent: split,
 		dMessage:     m,
 		Type:         *cmd,
+		Resp:         nil,
 	}
 
 	return out
-
 }
 
-func ParseRequest(r Request, s *discordgo.Session, allVerbs *[]Verb) discordgo.MessageSend {
+func ParseRequest(r *Request, s *discordgo.Session, allVerbs *[]Verb) discordgo.MessageSend {
 	log.Println(r.Type.Name)
 	log.Println(r.Type.HotStrings)
 	return r.Type.Function(r, s, allVerbs)

@@ -26,7 +26,7 @@ type Gif struct {
 // +<verb> [recipient] [-t tags]
 // and returns a discord message, including a gif reaction
 // of the inputted verb, assuming one exists.
-func VerbCommand(myRequest Request, s *discordgo.Session, allVerbs *[]Verb) discordgo.MessageSend {
+func VerbCommand(myRequest *Request, s *discordgo.Session, allVerbs *[]Verb) discordgo.MessageSend {
 	// Create the message to send out
 	m := discordgo.MessageSend{}
 
@@ -93,7 +93,7 @@ func VerbCommand(myRequest Request, s *discordgo.Session, allVerbs *[]Verb) disc
 }
 
 // ListVerbs lists all verbs in allVerbs
-func ListVerbs(_ Request, _ *discordgo.Session, allVerbs *[]Verb) discordgo.MessageSend {
+func ListVerbs(_ *Request, _ *discordgo.Session, allVerbs *[]Verb) discordgo.MessageSend {
 	m := discordgo.MessageSend{}
 
 	m.Content = "```"

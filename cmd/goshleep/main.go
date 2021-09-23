@@ -20,6 +20,7 @@ var (
 	Token    string
 	allVerbs []goshleep.Verb
 	Prefix   string
+	responses []goshleep.Response
 )
 
 type gifs []*goshleep.Gif
@@ -91,6 +92,15 @@ func main() {
 // This function will be called (due to AddHandler above) every time a new
 // message is created on any channel that the authenticated bot has access to.
 func messageCreate(s *discordgo.Session, mCreate *discordgo.MessageCreate) {
+	if (len(responses) > 0) {
+		for _, r := range responses {
+			if (goshleep.Contains(r.UserList, mCreate.Author.ID)){
+				if (r.Check(mCreate.Content)) {
+					r.Run(mCreate.Content, s, &allVerbs)
+				}
+			}
+		}
+	}
 	if strings.HasPrefix(mCreate.Message.Content, "+") {
 		m := goshleep.ConstructRequest(*mCreate.Message)
 
@@ -102,22 +112,10 @@ func messageCreate(s *discordgo.Session, mCreate *discordgo.MessageCreate) {
 		if mCreate.Author.ID == s.State.User.ID {
 			return
 		}
-		out = goshleep.ParseRequest(m, s, &allVerbs)
-		// splitm := strings.Split(m.Content, " ")
-
-		// if m.Content == viper.GetString("cmdprefix")+"verbs" {
-		// 	out = ListVerbs(&allVerbs)
-		// }
-
-		// // If the message is "pong" reply with "Ping!"
-		// if m.Content == "pong" {
-		// 	s.ChannelMessageSendComplex(m.dMessage.ChannelID, &out)
-		// }
-		// if (strings.HasPrefix(splitm[0], Prefix) && out.Content == discordgo.MessageSend{}.Content) {
-		// 	out = VerbCommand(m, s, &allVerbs)
-		// }
-
+		out = goshleep.ParseRequest(&m, s, &allVerbs)
+		if (m.Resp != nil) {
+			responses = append(responses, *m.Resp)
+		}
 		s.ChannelMessageSendComplex(mCreate.ChannelID, &out)
 	}
-
 }
