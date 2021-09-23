@@ -44,26 +44,27 @@ func VerbCommand(myRequest Request, s *discordgo.Session, allVerbs *[]Verb) disc
 		// These need to be declared early so they can be used outside the loop
 		var i int
 		var w string
+		var tags []string
 		for i, w = range cmd {
-			log.Println(w)
 			// Only go through till u see -t
 			if w == "-t" {
 				break
 			}
 		}
-		log.Println(i)
+		tags = cmd[i+1:]
 		// If there is a recipient
 		if i > 0 {
 			// Create an array from everything after the verb to the -t (assuming it exists)
-			recipientArray := cmd[1 : i+1]
+			recipientArray := cmd[1:i]
 			log.Println("Found names", recipientArray)
 			recipient := strings.Join(recipientArray, " ")
+			log.Println("Found names", recipient)
 
 			// This is the format of the message
 			title := "**RECIPIENT**, you got a **VERB** from **SENDER**"
 
 			// If there are mentions, use them as the recipients
-			if len(myRequest.dMessage.Content) > 0 {
+			if len(myRequest.dMessage.Mentions) > 0 {
 				recipient = GetMentionNames(&myRequest.dMessage, s)
 			}
 			title = strings.ReplaceAll(title, "RECIPIENT", recipient)
@@ -82,18 +83,10 @@ func VerbCommand(myRequest Request, s *discordgo.Session, allVerbs *[]Verb) disc
 			}
 		}
 		// Get the actual image
-		var num int
-		if len(v.Images) > 1 {
-			log.Println("I found a number of images")
-			num = rand.Intn(len(v.Images) - 1)
-		} else {
-			log.Println("I only found 1 image")
-			num = 0
-		}
+		img, _ := getImage(v, tags)
 		m.Embed.Image = &discordgo.MessageEmbedImage{
-			URL: v.Images[num].URL,
+			URL: img.URL,
 		}
-
 	}
 
 	return m
@@ -118,7 +111,8 @@ func getVerb(toFind string, allVerbs *[]Verb) (*Verb, bool) {
 	var out Verb
 	out = Verb{
 		Images: []*Gif{
-			&Gif{
+			{
+				// Default picture, for failures
 				URL:  "https://animemotivation.com/wp-content/uploads/2020/06/cute-anime-cat-girl-confused-e1592069452432.jpg",
 				Tags: []string{},
 			},
@@ -152,4 +146,36 @@ func getVerb(toFind string, allVerbs *[]Verb) (*Verb, bool) {
 	}
 
 	return &out, fuzz
+}
+
+func getImage(v *Verb, tags []string) (*Gif, bool) {
+
+	var num int
+	tag := false
+	var allGifs []*Gif
+
+	if len(tags) > 0 {
+		// Get all valid images
+		for _, g := range v.Images {
+			for _, t := range tags {
+				if Contains(g.Tags, t) {
+					allGifs = append(allGifs, g)
+					tag = true
+				}
+			}
+		}
+
+	}
+	if len(allGifs) == 0 {
+		allGifs = v.Images
+	}
+	if len(allGifs) > 1 {
+		log.Println("I found a number of images")
+		num = rand.Intn(len(allGifs) - 1)
+	} else {
+		log.Println("I only found 1 image")
+		num = 0
+	}
+
+	return allGifs[num], tag
 }

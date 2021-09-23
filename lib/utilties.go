@@ -1,4 +1,4 @@
-package goshleep 
+package goshleep
 
 import (
 	"strings"
@@ -29,6 +29,7 @@ func GetMentionNames(m *discordgo.Message, s *discordgo.Session) string {
 
 }
 
+
 // Checks
 func IfMatchHotStrings (arr []string, check string) bool{
 
@@ -43,4 +44,13 @@ func IfMatchHotStrings (arr []string, check string) bool{
 	}
 
 	return out
+}
+
+func Contains(slice []string, s string) bool {
+	for _, item := range slice {
+		if item == s {
+			return true;
+		}
+	}
+	return false;
 }
