@@ -23,7 +23,7 @@ var (
 	responses []goshleep.Response
 )
 
-type gifs []*goshleep.Gif
+type gifs []goshleep.Gif
 type verbs []goshleep.Verb
 
 func init() {
@@ -65,22 +65,12 @@ func main() {
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
 
-	g := &goshleep.Gif{
-		URL:  "https://media1.tenor.com/images/4d89d7f963b41a416ec8a55230dab31b/tenor.gif?itemid=5166500",
-		Tags: []string{"test", "t"},
-	}
-	// g2 := &goshleep.Gif{
-	// 	URL:  "https://uberi.fi",
-	// 	Tags: []string{"test", "a"}}
-
-	collection := gifs{g}
-	allVerbs = []goshleep.Verb{{Images: collection, Name: "pat"}} // Store(allVerbs)
+	allVerbs = []goshleep.Verb{{Images: []goshleep.Gif{}, Name: "pat"}} // Store(allVerbs)
 	v := []goshleep.Verb{}
 
 	goshleep.Load(&v)
 	allVerbs = v
 	goshleep.Store(v)
-	//fmt.Println(v)
 	<-sc
 
 	log.Println("Closing bot.")

@@ -19,6 +19,7 @@ func AutoConfig() {
         "Without a doubt", "No", "Yes", "You'll be the judge", "Sure",
         "Of course", "No way", "No... (╯°□°）╯︵ ┻━┻", "Very doubtful",
         "Most likely", "Might be possible" })
+	viper.SetDefault("admins", []string{"156903320945033216"})
 
 	viper.SetConfigName("conf")                    // name of config file (without extension)
 	viper.SetConfigType("yaml")                    // REQUIRED if the config file does not have the extension in the name
@@ -38,4 +39,11 @@ func AutoConfig() {
 	}
 	// Config file found and successfully parsed
 
+}
+
+func ReadViper() {
+	err := viper.ReadInConfig()
+	if err != nil {
+			log.Println(err)
+	}
 }

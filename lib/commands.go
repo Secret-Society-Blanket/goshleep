@@ -1,38 +1,30 @@
 package goshleep
 
 import (
-	"strings"
 	"log"
+	"strings"
+
 	"github.com/bwmarrin/discordgo"
+	"github.com/spf13/viper"
 )
 
 type CommandFunction func(details *Request, s *discordgo.Session, allVerbs *[]Verb) discordgo.MessageSend
 
 type Request struct {
-	dMessage discordgo.Message
-
-	Content string
-
+	dMessage     discordgo.Message
+	Content      string
 	SplitContent []string
-
-	Type Command
-
-	Resp *Response `default: nil`
+	Type         Command
+	Resp         *Response
 }
 
 type Command struct {
-	Name string
-
+	Name        string
 	Description string
-
-	HotStrings []string
-
-	Function CommandFunction
-
-	Admin bool
-
-	Priority int // 0 = lowest
-
+	HotStrings  []string
+	Function    CommandFunction
+	Admin       bool
+	Priority    int // 0 = lowest
 }
 
 var (
@@ -61,6 +53,22 @@ var (
 			HotStrings:  []string{"eightball"},
 			Function:    ListVerbs,
 			Admin:       false,
+			Priority:    0,
+		},
+		{
+			Name:        "Add",
+			Description: "Adds a gif, and creates a verb if needed.",
+			HotStrings:  []string{"add"},
+			Function:    AddGifCommand,
+			Admin:       true,
+			Priority:    0,
+		},
+		{
+			Name:        "AddAdmin",
+			Description: "Adds a given discord string or mention as an admin",
+			HotStrings:  []string{"addAdmin", "aadd", "adminAdd"},
+			Function:    AddAdminCommand,
+			Admin:       true,
 			Priority:    0,
 		},
 	}
@@ -96,5 +104,18 @@ func ConstructRequest(m discordgo.Message) Request {
 func ParseRequest(r *Request, s *discordgo.Session, allVerbs *[]Verb) discordgo.MessageSend {
 	log.Println(r.Type.Name)
 	log.Println(r.Type.HotStrings)
-	return r.Type.Function(r, s, allVerbs)
+	ReadViper()
+	if r.Type.Admin {
+		if Contains(viper.GetStringSlice("admins"), r.dMessage.Author.ID) {
+			return r.Type.Function(r, s, allVerbs)
+		} else {
+			return discordgo.MessageSend{
+				Content:   "You tried to run an admin command, but you aren't an admin!",
+				Reference: r.dMessage.Reference(),
+			}
+		}
+
+	} else {
+		return r.Type.Function(r, s, allVerbs)
+	}
 }

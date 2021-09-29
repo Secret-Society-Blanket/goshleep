@@ -12,7 +12,7 @@ import (
 
 // Verb is a collection of gifs
 type Verb struct {
-	Images []*Gif
+	Images []Gif
 	Name   string
 }
 
@@ -110,7 +110,7 @@ func ListVerbs(_ *Request, _ *discordgo.Session, allVerbs *[]Verb) discordgo.Mes
 func getVerb(toFind string, allVerbs *[]Verb) (*Verb, bool) {
 	var out Verb
 	out = Verb{
-		Images: []*Gif{
+		Images: []Gif{
 			{
 				// Default picture, for failures
 				URL:  "https://animemotivation.com/wp-content/uploads/2020/06/cute-anime-cat-girl-confused-e1592069452432.jpg",
@@ -129,7 +129,6 @@ func getVerb(toFind string, allVerbs *[]Verb) (*Verb, bool) {
 		// If it matches, and the distance is less than 4
 		if i != -1 && i < 4 {
 			log.Println(v.Name, "matches", toFind)
-
 			// Is the distance less than the last?
 			// If not, ignore the result
 			if i < last {
@@ -141,7 +140,6 @@ func getVerb(toFind string, allVerbs *[]Verb) (*Verb, bool) {
 				out = v
 				last = i
 			}
-
 		}
 	}
 
@@ -159,7 +157,7 @@ func getImage(v *Verb, tags []string) (*Gif, bool) {
 		for _, g := range v.Images {
 			for _, t := range tags {
 				if Contains(g.Tags, t) {
-					allGifs = append(allGifs, g)
+					allGifs = append(allGifs, &g)
 					tag = true
 				}
 			}
@@ -167,7 +165,7 @@ func getImage(v *Verb, tags []string) (*Gif, bool) {
 
 	}
 	if len(allGifs) == 0 {
-		allGifs = v.Images
+		allGifs = makeReference(v.Images)
 	}
 	if len(allGifs) > 1 {
 		log.Println("I found a number of images")

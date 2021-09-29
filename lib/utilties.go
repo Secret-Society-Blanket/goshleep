@@ -29,7 +29,6 @@ func GetMentionNames(m *discordgo.Message, s *discordgo.Session) string {
 
 }
 
-
 // Checks
 func IfMatchHotStrings (arr []string, check string) bool{
 
@@ -53,4 +52,13 @@ func Contains(slice []string, s string) bool {
 		}
 	}
 	return false;
+}
+
+
+func makeReference(slice []Gif)  []*Gif {
+	out := []*Gif{};
+	for _, g := range slice {
+		out = append(out, &g)
+	}
+	return out;
 }
