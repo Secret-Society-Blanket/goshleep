@@ -1,0 +1,5 @@
+#+filetags: :goshleep:
+* TODO Eightball 
+  Highball needs to be implemented
+* WAIT Responses
+* TODO Remove Gifs
