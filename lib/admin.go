@@ -80,5 +80,4 @@ func addAdmin(id string) bool {
 	}
 	viper.WriteConfig();
 	return notPresent;
-
 }

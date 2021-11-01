@@ -51,7 +51,7 @@ var (
 			Name:        "Eightball",
 			Description: "Ask Shleepbot your most pressing questions...",
 			HotStrings:  []string{"eightball"},
-			Function:    ListVerbs,
+			Function:    Eightball,
 			Admin:       false,
 			Priority:    0,
 		},

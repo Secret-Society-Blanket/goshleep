@@ -111,7 +111,7 @@ func getVerb(toFind string, allVerbs *[]Verb) (*Verb, bool) {
 	var out Verb
 	out = Verb{
 		Images: []Gif{
-			{
+		{
 				// Default picture, for failures
 				URL:  "https://animemotivation.com/wp-content/uploads/2020/06/cute-anime-cat-girl-confused-e1592069452432.jpg",
 				Tags: []string{},
