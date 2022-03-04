@@ -27,6 +27,13 @@ type Command struct {
 	Priority    int // 0 = lowest
 }
 
+func baseMessage(details *Request) discordgo.MessageSend {
+	m :=discordgo.MessageSend{}
+	m.Reference = details.dMessage.Reference()
+	m.AllowedMentions = nil
+	return m
+}
+
 var (
 	AllCommands []Command = []Command{
 
@@ -56,10 +63,18 @@ var (
 			Priority:    0,
 		},
 		{
-			Name:        "Add",
+			Name:        "Add Gif",
 			Description: "Adds a gif, and creates a verb if needed.",
 			HotStrings:  []string{"add"},
 			Function:    AddGifCommand,
+			Admin:       true,
+			Priority:    0,
+		},
+		{
+			Name:        "Remove Gif",
+			Description: "Removes a gif from a given verb.",
+			HotStrings:  []string{"remove"},
+			Function:    RemoveGifCommand,
 			Admin:       true,
 			Priority:    0,
 		},
@@ -68,6 +83,14 @@ var (
 			Description: "Adds a given discord string or mention as an admin",
 			HotStrings:  []string{"addAdmin", "aadd", "adminAdd"},
 			Function:    AddAdminCommand,
+			Admin:       true,
+			Priority:    0,
+		},
+		{
+			Name:        "Add Synonym",
+			Description: "Adds a verb as a synonym for another",
+			HotStrings:  []string{"synonym", "sadd", "synonymadd"},
+			Function:    AddSynonymCommand,
 			Admin:       true,
 			Priority:    0,
 		},

@@ -65,7 +65,7 @@ func main() {
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
 
-	allVerbs = []goshleep.Verb{{Images: []goshleep.Gif{}, Name: "pat"}} // Store(allVerbs)
+	allVerbs = []goshleep.Verb{{Images: []goshleep.Gif{}, Names: []string{"pat"}}} // Store(allVerbs)
 	v := []goshleep.Verb{}
 
 	goshleep.Load(&v)

@@ -13,13 +13,18 @@ import (
 // Verb is a collection of gifs
 type Verb struct {
 	Images []Gif
-	Name   string
+	Names  []string
 }
 
 // Gif is a struct containing a url and tags
 type Gif struct {
 	URL  string
 	Tags []string
+}
+
+type pair struct {
+	num  int
+	name string
 }
 
 // VerbCommand takes in the follow expected string template:
@@ -32,21 +37,22 @@ func VerbCommand(myRequest *Request, s *discordgo.Session, allVerbs *[]Verb) dis
 
 	cmd := myRequest.SplitContent
 
+	verbName := cmd[0][len(viper.GetString("prefix")):]
 	// This is finding the "verb" command
-	v, _ := getVerb(cmd[0][len(viper.GetString("prefix")):], allVerbs)
+	v, _ := getVerb(verbName, allVerbs)
 
 	// If there is no verb
 	if v == nil {
 		log.Println("Failed to find verb!")
 		m.Content = "I couldn't find it..."
 	} else {
-		log.Println("Found Verb: " + v.Name)
+		log.Println("Found Verb: " + v.Names[0])
 		// These need to be declared early so they can be used outside the loop
 		var i int
 		var w string
 		var tags []string
 		for i, w = range cmd {
-			// Only go through till u see -t
+			// Only go through till it sees -t
 			if w == "-t" {
 				break
 			}
@@ -55,7 +61,7 @@ func VerbCommand(myRequest *Request, s *discordgo.Session, allVerbs *[]Verb) dis
 		// If there is a recipient
 		if i > 0 {
 			// Create an array from everything after the verb to the -t (assuming it exists)
-			recipientArray := cmd[1:i]
+			recipientArray := cmd[1 : i+1]
 			log.Println("Found names", recipientArray)
 			recipient := strings.Join(recipientArray, " ")
 			log.Println("Found names", recipient)
@@ -68,7 +74,7 @@ func VerbCommand(myRequest *Request, s *discordgo.Session, allVerbs *[]Verb) dis
 				recipient = GetMentionNames(&myRequest.dMessage, s)
 			}
 			title = strings.ReplaceAll(title, "RECIPIENT", recipient)
-			title = strings.ReplaceAll(title, "VERB", v.Name)
+			title = strings.ReplaceAll(title, "VERB", verbName)
 			title = strings.ReplaceAll(title, "SENDER", GetName(myRequest.dMessage.Member))
 			m.Embed = &discordgo.MessageEmbed{
 				Title: title,
@@ -76,7 +82,7 @@ func VerbCommand(myRequest *Request, s *discordgo.Session, allVerbs *[]Verb) dis
 			// If there isn't a recipient
 		} else {
 			title := "**SENDER sent a VERB**"
-			title = strings.ReplaceAll(title, "VERB", v.Name)
+			title = strings.ReplaceAll(title, "VERB", verbName)
 			title = strings.ReplaceAll(title, "SENDER", GetName(myRequest.dMessage.Member))
 			m.Embed = &discordgo.MessageEmbed{
 				Title: title,
@@ -88,7 +94,6 @@ func VerbCommand(myRequest *Request, s *discordgo.Session, allVerbs *[]Verb) dis
 			URL: img.URL,
 		}
 	}
-
 	return m
 }
 
@@ -98,37 +103,50 @@ func ListVerbs(_ *Request, _ *discordgo.Session, allVerbs *[]Verb) discordgo.Mes
 
 	m.Content = "```"
 	var verbNames []string
-	for _, v := range *allVerbs {
-		verbNames = append(verbNames, v.Name)
+	all := allNames(allVerbs)
+	lastNum := -1
+	num := -1
+	for _, v := range all {
+		verbNames = append(verbNames, v.name)
+		num = v.num
+		if num != lastNum {
+			m.Content = m.Content + "\n"
+		} else {
+			m.Content = m.Content + ", "
+		}
 		// Temporary, change this later!
-		m.Content = m.Content + v.Name + "\n"
+		m.Content = m.Content + v.name
+		lastNum = num
 	}
 	m.Content = m.Content + "\n```"
 	return m
 }
 
 func getVerb(toFind string, allVerbs *[]Verb) (*Verb, bool) {
-	var out Verb
-	out = Verb{
+	var out *Verb
+	out = &Verb{
 		Images: []Gif{
-		{
+			{
 				// Default picture, for failures
 				URL:  "https://animemotivation.com/wp-content/uploads/2020/06/cute-anime-cat-girl-confused-e1592069452432.jpg",
 				Tags: []string{},
 			},
 		},
-		Name: "unknown",
+		Names: []string{"unknown"},
 	}
 	fuzz := false
 	last := 10
-	for _, v := range *allVerbs {
+
+	all := allNames(allVerbs)
+
+	for _, n := range all {
 		// Get the levensthien distance if it matches, otherwise return -1
 		i := fuzzy.LevenshteinDistance(strings.ToLower(toFind),
-			strings.ToLower(v.Name))
+			strings.ToLower(n.name))
 
 		// If it matches, and the distance is less than 4
 		if i != -1 && i < 4 {
-			log.Println(v.Name, "matches", toFind)
+			log.Println(n.name, "matches", toFind)
 			// Is the distance less than the last?
 			// If not, ignore the result
 			if i < last {
@@ -137,34 +155,51 @@ func getVerb(toFind string, allVerbs *[]Verb) (*Verb, bool) {
 				} else {
 					fuzz = false
 				}
-				out = v
+				out = &(*allVerbs)[n.num]
 				last = i
 			}
 		}
 	}
 
-	return &out, fuzz
+	return out, fuzz
+}
+
+func allNames(allVerbs *[]Verb) []pair {
+	out := []pair{}
+
+	for i, v := range *allVerbs {
+		for _, n := range v.Names {
+			p := pair{
+				num:  i,
+				name: n,
+			}
+			out = append(out, p)
+		}
+	}
+	return out
 }
 
 func getImage(v *Verb, tags []string) (*Gif, bool) {
-
 	var num int
 	tag := false
 	var allGifs []*Gif
 
 	if len(tags) > 0 {
 		// Get all valid images
-		for _, g := range v.Images {
+		for i, g := range v.Images {
 			for _, t := range tags {
 				if Contains(g.Tags, t) {
-					allGifs = append(allGifs, &g)
+					log.Println("Found tag: " + t)
+					allGifs = append(allGifs, &v.Images[i])
 					tag = true
 				}
 			}
 		}
 
 	}
+	// If there are no tags, or if nothing is found
 	if len(allGifs) == 0 {
+		log.Println("I couldn't find any matching gifs, so I'm just using all of them")
 		allGifs = makeReference(v.Images)
 	}
 	if len(allGifs) > 1 {

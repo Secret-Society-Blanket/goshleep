@@ -57,8 +57,8 @@ func Contains(slice []string, s string) bool {
 
 func makeReference(slice []Gif)  []*Gif {
 	out := []*Gif{};
-	for _, g := range slice {
-		out = append(out, &g)
+	for i, _ := range slice {
+		out = append(out, &slice[i])
 	}
 	return out;
 }

@@ -1,5 +1,6 @@
 #+filetags: :goshleep:
-* TODO Eightball 
-  Highball needs to be implemented
+* DONE Eightball 
+CLOSED: [2022-03-03 Thu 18:42]
+  Eightball needs to be implemented
 * WAIT Responses
 * TODO Remove Gifs

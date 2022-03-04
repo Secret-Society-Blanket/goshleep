@@ -1,7 +1,0 @@
-* Inbox
-** TODO Admin Commands
-
-[[file:~/Projects/goshleep/src/main.go::package main]]
-- [ ] Syonym
-- [ ] Add verb
-- [ ] Add gif
