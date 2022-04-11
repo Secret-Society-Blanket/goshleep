@@ -1,21 +1,20 @@
-package goshleep 
+package goshleep
 
 import (
+	"encoding/json"
 	"fmt"
+	"github.com/spf13/viper"
 	"io"
 	"io/ioutil"
 	"log"
 	"os"
 	"time"
-
-	"github.com/goccy/go-yaml"
-	"github.com/spf13/viper"
 )
 
 // Store a collection of verbs
 func Store(toStore []Verb) string {
 	// fmt.Println("Storing...")
-	bytes, err := yaml.Marshal(toStore)
+	bytes, err := json.Marshal(toStore)
 
 	if err != nil {
 		log.Println(err)
@@ -27,7 +26,7 @@ func Store(toStore []Verb) string {
 	prefix := viper.GetString("storage") + "backups/"
 	prefix += t.Format("15:04-2-1-06|")
 	writeToFile(prefix+suffix, string(bytes))
-	writeToFile(viper.GetString("storage")+"stored.yaml", string(bytes))
+	writeToFile(viper.GetString("storage")+"stored.json", string(bytes))
 
 	return (prefix + suffix)
 
@@ -35,10 +34,8 @@ func Store(toStore []Verb) string {
 
 // Load a collection of verbs
 func Load(out *[]Verb) {
-	txt := loadFromFile(viper.GetString("storage") + "stored.yaml")
-	if err := yaml.Unmarshal(txt, out); err != nil {
-		fmt.Println(err)
-	}
+	txt := loadFromFile(viper.GetString("storage") + "stored.json")
+	if err := json.Unmarshal(txt, out); err != nil {fmt.Println(err)}
 }
 
 func writeToFile(filename string, data string) error {
