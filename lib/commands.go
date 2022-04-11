@@ -21,6 +21,7 @@ type Request struct {
 type Command struct {
 	Name        string
 	Description string
+	Template    string
 	HotStrings  []string
 	Function    CommandFunction
 	Admin       bool
@@ -28,7 +29,7 @@ type Command struct {
 }
 
 func baseMessage(details *Request) discordgo.MessageSend {
-	m :=discordgo.MessageSend{}
+	m := discordgo.MessageSend{}
 	m.Reference = details.dMessage.Reference()
 	m.AllowedMentions = nil
 	return m
@@ -41,6 +42,7 @@ var (
 		{
 			Name:        "Verb",
 			Description: "Posts a GIF based on the arguments the user gives",
+			Template:    "+<verbname> @<user> [-t <tags>]",
 			HotStrings:  []string{""},
 			Function:    VerbCommand,
 			Admin:       false,
@@ -49,6 +51,7 @@ var (
 		{
 			Name:        "List Verbs",
 			Description: "Lists all verbs",
+			Template :"+verbs",
 			HotStrings:  []string{"verbs"},
 			Function:    ListVerbs,
 			Admin:       false,
@@ -57,8 +60,18 @@ var (
 		{
 			Name:        "Eightball",
 			Description: "Ask Shleepbot your most pressing questions...",
+			Template: "+eightball Should I eat some ice cream?",
 			HotStrings:  []string{"eightball"},
 			Function:    Eightball,
+			Admin:       false,
+			Priority:    0,
+		},
+		{
+			Name:        "Choose",
+			Description: "Choose between a number of options!",
+			Template: "+choose <option 1> | <option 2> | <option 3>",
+			HotStrings:  []string{"choose"},
+			Function:    ChooseCommand,
 			Admin:       false,
 			Priority:    0,
 		},

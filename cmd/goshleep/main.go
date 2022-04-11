@@ -95,14 +95,14 @@ func messageCreate(s *discordgo.Session, mCreate *discordgo.MessageCreate) {
 		m := goshleep.ConstructRequest(*mCreate.Message)
 
 		log.Println("Inside message")
-		out := discordgo.MessageSend{}
+
 
 		// Ignore all messages created by the bot itself
 		// This isn't required in this specific example but it's a good practice.
 		if mCreate.Author.ID == s.State.User.ID {
 			return
 		}
-		out = goshleep.ParseRequest(&m, s, &allVerbs)
+		out := goshleep.ParseRequest(&m, s, &allVerbs)
 		if (m.Resp != nil) {
 			responses = append(responses, *m.Resp)
 		}

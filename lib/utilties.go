@@ -3,9 +3,8 @@ package goshleep
 import (
 	"strings"
 
-	"log"
-	"github.com/spf13/viper"
 	"github.com/bwmarrin/discordgo"
+	"github.com/spf13/viper"
 )
 
 // GetName takes a member and returns their name
@@ -30,14 +29,13 @@ func GetMentionNames(m *discordgo.Message, s *discordgo.Session) string {
 }
 
 // Checks
-func IfMatchHotStrings (arr []string, check string) bool{
+func IfMatchHotStrings(arr []string, check string) bool {
 
 	out := false
 
 	for i := 0; i < len(arr); i++ {
 
-		log.Println(arr[i])
-		if (strings.HasPrefix(check, viper.GetString("prefix") + arr[i])) {
+		if strings.HasPrefix(check, viper.GetString("prefix")+arr[i]) {
 			out = true
 		}
 	}
@@ -48,17 +46,16 @@ func IfMatchHotStrings (arr []string, check string) bool{
 func Contains(slice []string, s string) bool {
 	for _, item := range slice {
 		if item == s {
-			return true;
+			return true
 		}
 	}
-	return false;
+	return false
 }
 
-
-func makeReference(slice []Gif)  []*Gif {
-	out := []*Gif{};
-	for i, _ := range slice {
+func makeReference(slice []Gif) []*Gif {
+	out := []*Gif{}
+	for i := range slice {
 		out = append(out, &slice[i])
 	}
-	return out;
+	return out
 }
