@@ -78,6 +78,7 @@ var (
 		{
 			Name:        "Add Gif",
 			Description: "Adds a gif, and creates a verb if needed.",
+			Template:    "+add <verb> <url> [-t <tags>]",
 			HotStrings:  []string{"add"},
 			Function:    AddGifCommand,
 			Admin:       true,
@@ -86,6 +87,7 @@ var (
 		{
 			Name:        "Remove Gif",
 			Description: "Removes a gif from a given verb.",
+			Template:    "+remove <verb> <url>",
 			HotStrings:  []string{"remove"},
 			Function:    RemoveGifCommand,
 			Admin:       true,
@@ -93,7 +95,8 @@ var (
 		},
 		{
 			Name:        "AddAdmin",
-			Description: "Adds a given discord string or mention as an admin",
+			Description: "Adds a given discord ID or mention as an admin",
+			Template:    "+addAdmin @<user>",
 			HotStrings:  []string{"addAdmin", "aadd", "adminAdd"},
 			Function:    AddAdminCommand,
 			Admin:       true,
@@ -102,6 +105,7 @@ var (
 		{
 			Name:        "Add Synonym",
 			Description: "Adds a verb as a synonym for another",
+			Template:    "+synonym <new verb> <base verb>",
 			HotStrings:  []string{"synonym", "sadd", "synonymadd"},
 			Function:    AddSynonymCommand,
 			Admin:       true,
@@ -172,15 +176,17 @@ func HelpCommand(details *Request, s *discordgo.Session, _ *[]Verb) discordgo.Me
 
 	m := baseMessage(details)
 
-	msg := "```"
+	msg := ""
+	IsAdmin := Contains(viper.GetStringSlice("admins"), details.dMessage.Author.ID)
 	for _, cmd := range AllCommands {
-		if cmd.Admin == false {
-			msg = msg + cmd.Name + ":\n\t"
-			msg = msg + "Description: " + cmd.Description + "\n\t"
-			msg = msg + "Template: " + cmd.Template + "\n\n"
+
+		if cmd.Admin == true && !IsAdmin {
+			continue
 		}
+		msg = msg + cmd.Name + ":\n\t"
+		msg = msg + "Description: " + cmd.Description + "\n\t"
+		msg = msg + "Template: ``" + cmd.Template + "``\n\n"
 	}
-	msg = msg[:len(msg)-1] + "```"
 	m.Content = msg
 
 	return m
