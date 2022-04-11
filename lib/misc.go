@@ -44,3 +44,5 @@ func ChooseCommand(details *Request, s *discordgo.Session, _ *[]Verb) discordgo.
 		strings.TrimSpace(chosenOption), 1)
 	return out
 }
+
+

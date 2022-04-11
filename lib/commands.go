@@ -51,7 +51,7 @@ var (
 		{
 			Name:        "List Verbs",
 			Description: "Lists all verbs",
-			Template :"+verbs",
+			Template:    "+verbs",
 			HotStrings:  []string{"verbs"},
 			Function:    ListVerbs,
 			Admin:       false,
@@ -60,7 +60,7 @@ var (
 		{
 			Name:        "Eightball",
 			Description: "Ask Shleepbot your most pressing questions...",
-			Template: "+eightball Should I eat some ice cream?",
+			Template:    "+eightball Should I eat some ice cream?",
 			HotStrings:  []string{"eightball"},
 			Function:    Eightball,
 			Admin:       false,
@@ -69,7 +69,7 @@ var (
 		{
 			Name:        "Choose",
 			Description: "Choose between a number of options!",
-			Template: "+choose <option 1> | <option 2> | <option 3>",
+			Template:    "+choose <option 1> | <option 2> | <option 3>",
 			HotStrings:  []string{"choose"},
 			Function:    ChooseCommand,
 			Admin:       false,
@@ -114,6 +114,18 @@ func ConstructRequest(m discordgo.Message) Request {
 
 	split := strings.Split(m.Content, " ")
 
+	// This replaces AllCommands with AllCommands + Help. If we don't do this, it
+	// causes an initialization loop
+	AllCommands := append(AllCommands, (Command{
+		Name:        "Help",
+		Description: "Display this message!",
+		Template:    "+help",
+		HotStrings:  []string{"help"},
+		Function:    HelpCommand,
+		Admin:       false,
+		Priority:    0,
+	}))
+
 	var cmd *Command
 
 	for i := 0; i < len(AllCommands); i++ {
@@ -154,4 +166,23 @@ func ParseRequest(r *Request, s *discordgo.Session, allVerbs *[]Verb) discordgo.
 	} else {
 		return r.Type.Function(r, s, allVerbs)
 	}
+}
+
+func HelpCommand(details *Request, s *discordgo.Session, _ *[]Verb) discordgo.MessageSend {
+
+	m := baseMessage(details)
+
+	msg := "```"
+	for _, cmd := range AllCommands {
+		if cmd.Admin == false {
+			msg = msg + cmd.Name + ":\n\t"
+			msg = msg + "Description: " + cmd.Description + "\n\t"
+			msg = msg + "Template: " + cmd.Template + "\n\n"
+		}
+	}
+	msg = msg[:len(msg)-1] + "```"
+	m.Content = msg
+
+	return m
+
 }
