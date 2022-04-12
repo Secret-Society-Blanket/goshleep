@@ -16,9 +16,12 @@ func AutoConfig() {
 	viper.SetDefault("cmdPrefix", "+")
 	viper.SetDefault("eightballMessages", []string{"Senpai, pls no ;-;",
 		"Take a wild guess...",
-        "Without a doubt", "No", "Yes", "You'll be the judge", "Sure",
-        "Of course", "No way", "No... (╯°□°）╯︵ ┻━┻", "Very doubtful",
-        "Most likely", "Might be possible" })
+		"Without a doubt", "No", "Yes", "You'll be the judge", "Sure",
+		"Of course", "No way", "No... (╯°□°）╯︵ ┻━┻", "Very doubtful",
+		"Most likely", "Might be possible"})
+	viper.SetDefault("heartsList", []string{
+		"heart", "purple_heart", "white_heart", "green_heart", "yellow_heart", "black_heart", "brown_heart", "blue_heart", "orange_heart", "heartpulse", "sparkling_heart", "gift_heart", "cupid",
+	})
 	viper.SetDefault("admins", []string{"156903320945033216"})
 
 	viper.SetConfigName("conf")                    // name of config file (without extension)
@@ -44,6 +47,6 @@ func AutoConfig() {
 func ReadViper() {
 	err := viper.ReadInConfig()
 	if err != nil {
-			log.Println(err)
+		log.Println(err)
 	}
 }

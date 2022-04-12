@@ -45,4 +45,26 @@ func ChooseCommand(details *Request, s *discordgo.Session, _ *[]Verb) discordgo.
 	return out
 }
 
+func FCommand(details *Request, s *discordgo.Session, _ *[]Verb) discordgo.MessageSend {
+	out := baseMessage(details)
 
+	if len(details.SplitContent) > 1 {
+
+		str := strings.Replace(fTemplateWithThing, "NAME", GetName(details.dMessage.Member), 1)
+		str = strings.Replace(str, "THING", strings.Join(details.SplitContent[1:], " "), 1)
+		hearts := viper.GetStringSlice("heartsList")
+		heart := (hearts)[rand.Intn(len(hearts))]
+		str = strings.Replace(str, "HEART", heart, 1)
+		out.Content = str
+
+	} else {
+
+		str := strings.Replace(fTemplateNoThing, "NAME", GetName(details.dMessage.Member), 1)
+		hearts := viper.GetStringSlice("heartsList")
+		heart := (hearts)[rand.Intn(len(hearts))]
+		str = strings.Replace(str, "HEART", heart, 1)
+		out.Content = str
+	}
+
+	return out
+}

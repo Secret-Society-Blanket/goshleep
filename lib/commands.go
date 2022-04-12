@@ -67,6 +67,15 @@ var (
 			Priority:    0,
 		},
 		{
+			Name:        "F",
+			Description: "Pay your respects for something/someone",
+			Template:    "+f Josh",
+			HotStrings:  []string{"f"},
+			Function:    FCommand,
+			Admin:       false,
+			Priority:    0,
+		},
+		{
 			Name:        "Choose",
 			Description: "Choose between a number of options!",
 			Template:    "+choose <option 1> | <option 2> | <option 3>",
