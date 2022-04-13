@@ -74,7 +74,7 @@ func VerbCommand(myRequest *Request, s *discordgo.Session, allVerbs *[]Verb) dis
 			}
 			title = strings.ReplaceAll(title, "RECIPIENT", recipient)
 			title = strings.ReplaceAll(title, "VERB", verbName)
-			title = strings.ReplaceAll(title, "SENDER", GetName(myRequest.dMessage.Member))
+			title = strings.ReplaceAll(title, "SENDER", GetName(myRequest.dMessage.Author, myRequest.dMessage.GuildID, s))
 			m.Embed = &discordgo.MessageEmbed{
 				Title: title,
 			}
@@ -82,7 +82,7 @@ func VerbCommand(myRequest *Request, s *discordgo.Session, allVerbs *[]Verb) dis
 		} else {
 			title := "**SENDER sent a VERB**"
 			title = strings.ReplaceAll(title, "VERB", verbName)
-			title = strings.ReplaceAll(title, "SENDER", GetName(myRequest.dMessage.Member))
+			title = strings.ReplaceAll(title, "SENDER", GetName(myRequest.dMessage.Author, myRequest.dMessage.GuildID, s))
 			m.Embed = &discordgo.MessageEmbed{
 				Title: title,
 			}

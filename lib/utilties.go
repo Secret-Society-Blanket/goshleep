@@ -8,11 +8,15 @@ import (
 )
 
 // GetName takes a member and returns their name
-func GetName(u *discordgo.Member) string {
-	if u.Nick != "" {
-		return u.Nick
+func GetName(u *discordgo.User, guildID string, s *discordgo.Session) string {
+
+	m, _ := s.GuildMember(guildID, u.ID)
+
+	if m.Nick != "" {
+		return m.Nick
 	}
-	return u.User.Username
+
+	return u.Username
 }
 
 // GetMentionNames takes a message and a session, and returns a
@@ -21,8 +25,7 @@ func GetMentionNames(m *discordgo.Message, s *discordgo.Session) string {
 
 	var names []string
 	for _, user := range m.Mentions {
-		member, _ := s.GuildMember(m.GuildID, user.ID)
-		names = append(names, GetName(member))
+		names = append(names, GetName(user, m.GuildID, s))
 	}
 	return strings.Join(names, " and ")
 

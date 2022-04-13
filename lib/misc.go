@@ -38,7 +38,8 @@ func ChooseCommand(details *Request, s *discordgo.Session, _ *[]Verb) discordgo.
 	out := baseMessage(details)
 	choices := strings.Split(details.Content[len(details.SplitContent[0]):], "|")
 	chosenOption := choices[rand.Intn(len(choices))]
-	name := GetName(details.dMessage.Member)
+	name := GetName(details.dMessage.Author, details.dMessage.GuildID, s)
+
 	out.Content = strings.Replace(chooseTemplate, "NAME", name, 1)
 	out.Content = strings.Replace(out.Content, "CHOICE",
 		strings.TrimSpace(chosenOption), 1)
@@ -50,7 +51,7 @@ func FCommand(details *Request, s *discordgo.Session, _ *[]Verb) discordgo.Messa
 
 	if len(details.SplitContent) > 1 {
 
-		str := strings.Replace(fTemplateWithThing, "NAME", GetName(details.dMessage.Member), 1)
+		str := strings.Replace(fTemplateWithThing, "NAME", GetName(details.dMessage.Author, details.dMessage.GuildID, s), 1)
 		str = strings.Replace(str, "THING", strings.Join(details.SplitContent[1:], " "), 1)
 		hearts := viper.GetStringSlice("heartsList")
 		heart := (hearts)[rand.Intn(len(hearts))]
@@ -59,7 +60,7 @@ func FCommand(details *Request, s *discordgo.Session, _ *[]Verb) discordgo.Messa
 
 	} else {
 
-		str := strings.Replace(fTemplateNoThing, "NAME", GetName(details.dMessage.Member), 1)
+		str := strings.Replace(fTemplateNoThing, "NAME", GetName(details.dMessage.Author, details.dMessage.GuildID, s), 1)
 		hearts := viper.GetStringSlice("heartsList")
 		heart := (hearts)[rand.Intn(len(hearts))]
 		str = strings.Replace(str, "HEART", heart, 1)
