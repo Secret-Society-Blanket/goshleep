@@ -139,6 +139,11 @@ func getVerb(toFind string, allVerbs *[]Verb) (*Verb, bool) {
 
 	all := allNames(allVerbs)
 
+	// If no verb (if it's an empty prefix), return nothing
+	if (toFind == "") {
+		return nil, false
+	}
+
 	for _, n := range all {
 		// Get the levensthien distance if it matches, otherwise return -1
 		i := fuzzy.LevenshteinDistance(strings.ToLower(toFind),
