@@ -44,7 +44,6 @@ func VerbCommand(myRequest *Request, s *discordgo.Session, allVerbs *[]Verb) dis
 	// If there is no verb
 	if v == nil {
 		log.Println("Failed to find verb!")
-		m.Content = "I couldn't find it..."
 	} else {
 		log.Println("Found Verb: " + v.Names[0])
 		// These need to be declared early so they can be used outside the loop
