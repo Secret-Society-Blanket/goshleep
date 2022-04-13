@@ -149,6 +149,7 @@ func ConstructRequest(m discordgo.Message) Request {
 
 	if cmd == nil {
 		log.Println("Found no command")
+		cmd = &AllCommands[0]
 	}
 
 	out := Request{

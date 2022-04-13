@@ -2,6 +2,7 @@ package goshleep
 
 import (
 	"strings"
+	"log"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/spf13/viper"
@@ -35,11 +36,16 @@ func GetMentionNames(m *discordgo.Message, s *discordgo.Session) string {
 func IfMatchHotStrings(arr []string, check string) bool {
 
 	out := false
+	prefix := viper.GetString("prefix")
 
 	for i := 0; i < len(arr); i++ {
 
 		if strings.HasPrefix(check, viper.GetString("prefix")+arr[i]) {
-			out = true
+			log.Println("I think I found a command, double checking...")
+			if !(len(prefix+arr[i]) < len(check)) {
+				log.Println("Yep!")
+				out = true
+			}
 		}
 	}
 
