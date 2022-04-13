@@ -2,13 +2,12 @@ package goshleep
 
 import (
 	"strings"
-	"log"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/spf13/viper"
 )
 
-// GetName takes a member and returns their name
+// GetName takes a user and guildID and returns their name
 func GetName(u *discordgo.User, guildID string, s *discordgo.Session) string {
 
 	m, _ := s.GuildMember(guildID, u.ID)
@@ -41,9 +40,10 @@ func IfMatchHotStrings(arr []string, check string) bool {
 	for i := 0; i < len(arr); i++ {
 
 		if strings.HasPrefix(check, viper.GetString("prefix")+arr[i]) {
-			log.Println("I think I found a command, double checking...")
+
+			/* This is needed to double check that it is actually the correct command,
+			and not a substring of a different command or verb. */
 			if !(len(prefix+arr[i]) < len(check)) {
-				log.Println("Yep!")
 				out = true
 			}
 		}

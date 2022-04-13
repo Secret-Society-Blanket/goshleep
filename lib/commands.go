@@ -148,7 +148,10 @@ func ConstructRequest(m discordgo.Message) Request {
 	}
 
 	if cmd == nil {
-		log.Println("Found no command")
+		log.Println("Found no extra command, defaulting to verb.")
+		/* This should always be the Verb command. The reason this is necessary is
+		 in order to fix an error involving substrings of commands, the verb command would
+		basically never be found. */
 		cmd = &AllCommands[0]
 	}
 
@@ -163,10 +166,12 @@ func ConstructRequest(m discordgo.Message) Request {
 	return out
 }
 
+// This is the function that actually runs a request, or command.
 func ParseRequest(r *Request, s *discordgo.Session, allVerbs *[]Verb) discordgo.MessageSend {
 	log.Println(r.Type.Name)
 	log.Println(r.Type.HotStrings)
 	ReadViper()
+	// If this command needs an admin, verify user is an admin. 
 	if r.Type.Admin {
 		if Contains(viper.GetStringSlice("admins"), r.dMessage.Author.ID) {
 			return r.Type.Function(r, s, allVerbs)
@@ -178,6 +183,7 @@ func ParseRequest(r *Request, s *discordgo.Session, allVerbs *[]Verb) discordgo.
 		}
 
 	} else {
+		// This is what actually runs the function.
 		return r.Type.Function(r, s, allVerbs)
 	}
 }
