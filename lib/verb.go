@@ -60,7 +60,12 @@ func VerbCommand(myRequest *Request, s *discordgo.Session, allVerbs *[]Verb) dis
 		// If there is a recipient
 		if i > 0 {
 			// Create an array from everything after the verb to the -t (assuming it exists)
-			recipientArray := cmd[1 : i]
+			var recipientArray []string;
+			if (len(cmd) != i) {
+				recipientArray = cmd[1 : i]
+			} else {
+				recipientArray = cmd[1 : i+1]
+			}
 			log.Println("Found names", recipientArray)
 			recipient := strings.Join(recipientArray, " ")
 			log.Println("Found names", recipient)
