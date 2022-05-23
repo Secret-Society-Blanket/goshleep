@@ -61,7 +61,7 @@ func VerbCommand(myRequest *Request, s *discordgo.Session, allVerbs *[]Verb) dis
 		if i > 0 {
 			// Create an array from everything after the verb to the -t (assuming it exists)
 			var recipientArray []string;
-			if (len(cmd) != i) {
+			if (len(cmd) != i + 1) {
 				recipientArray = cmd[1 : i]
 			} else {
 				recipientArray = cmd[1 : i+1]
