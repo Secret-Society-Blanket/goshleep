@@ -39,7 +39,10 @@ func VerbCommand(myRequest *Request, s *discordgo.Session, allVerbs *[]Verb) dis
 
 	verbName := cmd[0][len(viper.GetString("prefix")):]
 	// This is finding the "verb" command
-	v, _ := getVerb(verbName, allVerbs)
+	v, f := getVerb(verbName, allVerbs)
+	if f {
+		verbName = v.Names[0]
+	}
 
 	// If there is no verb
 	if v == nil {
@@ -60,9 +63,9 @@ func VerbCommand(myRequest *Request, s *discordgo.Session, allVerbs *[]Verb) dis
 		// If there is a recipient
 		if i > 0 {
 			// Create an array from everything after the verb to the -t (assuming it exists)
-			var recipientArray []string;
-			if (len(cmd) != i + 1) {
-				recipientArray = cmd[1 : i]
+			var recipientArray []string
+			if len(cmd) != i+1 {
+				recipientArray = cmd[1:i]
 			} else {
 				recipientArray = cmd[1 : i+1]
 			}
@@ -144,7 +147,7 @@ func getVerb(toFind string, allVerbs *[]Verb) (*Verb, bool) {
 	all := allNames(allVerbs)
 
 	// If no verb (if it's an empty prefix), return nothing
-	if (toFind == "") {
+	if toFind == "" {
 		return nil, false
 	}
 
