@@ -165,9 +165,9 @@ func getVerb(toFind string, allVerbs *[]Verb) (*Verb, bool) {
 				if i != 0 {
 					fuzz = true
 				} else {
+					out = &(*allVerbs)[n.num]
 					fuzz = false
 				}
-				out = &(*allVerbs)[n.num]
 				last = i
 			}
 		}
