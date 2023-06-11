@@ -153,22 +153,22 @@ func getVerb(toFind string, allVerbs *[]Verb) (*Verb, bool) {
 
 	for _, n := range all {
 		// Get the levensthien distance if it matches, otherwise return -1
-		i := fuzzy.LevenshteinDistance(strings.ToLower(toFind),
+		levenDistance := fuzzy.LevenshteinDistance(strings.ToLower(toFind),
 			strings.ToLower(n.name))
 
 		// If it matches, and the distance is less than 4
-		if i != -1 && i < 4 {
+		if levenDistance != -1 && levenDistance < 4 {
 			log.Println(n.name, "matches", toFind)
 			// Is the distance less than the last?
 			// If not, ignore the result
-			if i < last {
-				if i != 0 {
+			if levenDistance < last {
+				if levenDistance != 0 {
 					fuzz = true
 				} else {
 					out = &(*allVerbs)[n.num]
 					fuzz = false
 				}
-				last = i
+				last = levenDistance
 			}
 		}
 	}
