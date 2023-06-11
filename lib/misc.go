@@ -8,8 +8,8 @@ import (
 	"github.com/spf13/viper"
 )
 
+// Randomly gives an answer to some question, like an eightball
 func Eightball(details *Request, s *discordgo.Session, _ *[]Verb) discordgo.MessageSend {
-
 	var out string
 	var question string
 	if len(details.SplitContent) <= 1 {
@@ -21,9 +21,9 @@ func Eightball(details *Request, s *discordgo.Session, _ *[]Verb) discordgo.Mess
 	out = strings.ReplaceAll(eightballTemplate, "QUESTION", question)
 
 	answers := viper.GetStringSlice("eightballMessages")
-	numAnswers := len(answers)
+	numAnswers := len(answers) - 1
 
-	out = strings.ReplaceAll(out, "ANSWER", answers[rand.Intn(numAnswers-1)])
+	out = strings.ReplaceAll(out, "ANSWER", answers[rand.Intn(numAnswers)])
 
 	m := discordgo.MessageSend{
 		Content:   out,
@@ -34,10 +34,11 @@ func Eightball(details *Request, s *discordgo.Session, _ *[]Verb) discordgo.Mess
 
 }
 
+// Chooses between a number of options
 func ChooseCommand(details *Request, s *discordgo.Session, _ *[]Verb) discordgo.MessageSend {
 	out := baseMessage(details)
 
-	// Get all of the choices as a slice 
+	// Get all of the choices as a slice
 	choices := strings.Split(details.Content[len(details.SplitContent[0]):], "|")
 	chosenOption := choices[rand.Intn(len(choices))]
 	name := GetName(details.dMessage.Author, details.dMessage.GuildID, s)
@@ -48,6 +49,7 @@ func ChooseCommand(details *Request, s *discordgo.Session, _ *[]Verb) discordgo.
 	return out
 }
 
+// Press F to pay respects
 func FCommand(details *Request, s *discordgo.Session, _ *[]Verb) discordgo.MessageSend {
 	out := baseMessage(details)
 
