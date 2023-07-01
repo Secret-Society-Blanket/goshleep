@@ -18,4 +18,4 @@ install:
 	$(GOINSTALL) github.com/Secret-Society-Blanket/goshleep/cmd/goshleep
 
 run:
-	$(GORUN) ./cmd/goshleep -t $(KEY) -p +
+	./goshleep -t $(KEY) -p +

@@ -221,6 +221,7 @@ func getImage(v *Verb, tags []string) (*Gif, bool) {
 		log.Println("I only found 1 image")
 		num = 0
 	}
+  log.Println("Using image: " + allGifs[num].URL)
 
 	return allGifs[num], tag
 }
