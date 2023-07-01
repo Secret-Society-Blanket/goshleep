@@ -158,7 +158,7 @@ func getVerb(toFind string, allVerbs *[]Verb) (*Verb, bool) {
 
 		// If it matches, and the distance is less than 4
 		if levenDistance != -1 && levenDistance < 4 {
-			log.Println(n.name, "matches", toFind)
+			log.Println(n.name, "matches", toFind, "with distance", levenDistance)
 			// Is the distance less than the last?
 			// If not, ignore the result
 			if levenDistance < last {
@@ -221,7 +221,7 @@ func getImage(v *Verb, tags []string) (*Gif, bool) {
 		log.Println("I only found 1 image")
 		num = 0
 	}
-  log.Println("Using image: " + allGifs[num].URL)
+	log.Println("Using image: " + allGifs[num].URL)
 
 	return allGifs[num], tag
 }
