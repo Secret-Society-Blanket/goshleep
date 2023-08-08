@@ -8,7 +8,8 @@ import (
 	"os/signal"
 	"strings"
 	"syscall"
-
+	"math/rand"
+	"time"
 	"github.com/Secret-Society-Blanket/goshleep/lib"
 
 	"github.com/bwmarrin/discordgo"
