@@ -31,6 +31,8 @@ func init() {
 	flag.StringVar(&Token, "t", "", "Bot Token")
 	flag.StringVar(&Prefix, "p", "+", "Prefix")
 	flag.Parse()
+
+	rand.Seed(time.Now().Unix())
 }
 
 func main() {
@@ -41,20 +43,20 @@ func main() {
 	}
 
 	// Create a new Discord session using the provided bot token.
-	dg, err := discordgo.New("Bot " + Token)
+	discordConnection, err := discordgo.New("Bot " + Token)
 	if err != nil {
 		fmt.Println("error creating Discord session,", err)
 		return
 	}
 
 	// Register the messageCreate func as a callback for MessageCreate events.
-	dg.AddHandler(messageCreate)
+	discordConnection.AddHandler(messageCreate)
 
 	// In this example, we only care about receiving message events.
-	dg.Identify.Intents = discordgo.MakeIntent(discordgo.IntentsGuildMessages)
+	discordConnection.Identify.Intents = discordgo.MakeIntent(discordgo.IntentsGuildMessages)
 
 	// Open a websocket connection to Discord and begin listening.
-	err = dg.Open()
+	err = discordConnection.Open()
 	if err != nil {
 		fmt.Println("error opening connection,", err)
 		return
@@ -76,7 +78,7 @@ func main() {
 	log.Println("Closing bot.")
 
 	// Cleanly close down the Discord session.
-	dg.Close()
+	discordConnection.Close()
 }
 
 // This function will be called (due to AddHandler above) every time a new
